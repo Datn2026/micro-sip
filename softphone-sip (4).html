@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Điện thoại SIP</title>
+<style>
+:root{--bg:#eef2f1;--card:#fff;--ink:#14231f;--mut:#5d716b;--line:#d5dfdc;--pri:#0d7a66;--priInk:#fff;--red:#c8372d;--grn:#1f9d55;--amb:#b7791f;--key:#f3f7f6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1614;--card:#17221f;--ink:#e6efec;--mut:#8da39c;--line:#2a3a36;--pri:#2bb89c;--priInk:#06211b;--red:#e5594e;--grn:#3ecf82;--amb:#e0a73c;--key:#1e2d29;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1614;--card:#17221f;--ink:#e6efec;--mut:#8da39c;--line:#2a3a36;--pri:#2bb89c;--priInk:#06211b;--red:#e5594e;--grn:#3ecf82;--amb:#e0a73c;--key:#1e2d29;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Be Vietnam Pro","Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:440px;display:flex;flex-direction:column;min-height:100vh;background:var(--bg)}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:10px}
+h1{font-size:18px;margin:0;font-weight:700}
+.pill{display:flex;align-items:center;gap:7px;font-size:13px;padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);cursor:pointer;color:var(--ink)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--red)}
+.pill.on .dot{background:var(--grn)}.pill.busy .dot{background:var(--amb)}
+main{flex:1;padding:0 18px 12px;overflow:auto}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card);position:sticky;bottom:0}
+nav button{flex:1;padding:12px 2px;border:0;background:none;color:var(--mut);font:inherit;font-size:12px;cursor:pointer;border-top:3px solid transparent}
+nav button[aria-selected=true]{color:var(--pri);border-top-color:var(--pri);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.display{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.display input{flex:1;border:0;background:none;font:inherit;font-size:26px;color:var(--ink);min-width:0;letter-spacing:1px}
+.display input::placeholder{font-size:16px;color:var(--mut);letter-spacing:0}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pad button{height:64px;border-radius:16px;border:1px solid var(--line);background:var(--key);color:var(--ink);font:inherit;font-size:24px;font-weight:600;cursor:pointer}
+.pad button small{display:block;font-size:10px;color:var(--mut);font-weight:400;line-height:1}
+.pad button:active{background:var(--line)}
+.actions{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:10px;margin-top:12px;align-items:center}
+.call{height:64px;border-radius:32px;border:0;background:var(--grn);color:#fff;font:inherit;font-size:17px;font-weight:700;cursor:pointer}
+.ghost{height:48px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer;padding:0 14px}
+.ghost.danger{color:var(--red)}
+.list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.av{width:40px;height:40px;border-radius:50%;background:var(--pri);color:var(--priInk);display:grid;place-items:center;font-weight:700;flex:none}
+.row .t{flex:1;min-width:0}.row .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .t span{font-size:13px;color:var(--mut)}
+.miss b{color:var(--red)}
+.ib{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--key);cursor:pointer;font-size:16px;color:var(--ink)}
+.empty{padding:28px 16px;text-align:center;color:var(--mut)}
+.bar{display:flex;gap:8px;margin-bottom:12px}
+.bar input{flex:1}
+input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 14px 16px;margin-bottom:12px}
+.card h2{font-size:15px;margin:14px 0 0}
+.note{font-size:13px;color:var(--mut);background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:14px}.chk input{width:auto}
+.primary{background:var(--pri);color:var(--priInk);border:0;font-weight:700}
+#ov{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;padding:calc(40px + env(safe-area-inset-top,0px)) 24px calc(28px + env(safe-area-inset-bottom,0px));z-index:20}
+#ov.show{display:flex}
+#ov .av{width:92px;height:92px;font-size:36px;margin-top:20px}
+#ov h2{margin:16px 0 2px;font-size:24px;text-align:center}
+#st{color:var(--mut)}#tm{font-size:30px;font-variant-numeric:tabular-nums;margin:8px 0;min-height:40px}
+#dt{min-height:24px;letter-spacing:2px;color:var(--mut)}
+.ctl{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:auto;width:100%;max-width:340px}
+.ctl button{aspect-ratio:1;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.ctl button i{font-style:normal;font-size:22px}.ctl button.act{background:var(--pri);color:var(--priInk)}
+.end,.acc{width:76px;height:76px;border-radius:50%;border:0;color:#fff;font-size:26px;cursor:pointer}
+.end{background:var(--red)}.acc{background:var(--grn)}
+.btns{display:flex;gap:46px;margin-top:22px}
+#dtm{display:none;grid-template-columns:repeat(3,56px);gap:8px;margin-top:12px}
+#dtm button{height:48px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:20px;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+#toast.show{opacity:1}
+.chs{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px}.chip{flex:none;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}.chip small{display:block;color:var(--mut);font-size:11px}.chip.on{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri)}
+.ps{text-align:center;padding:9px;border-radius:10px;background:var(--key);font-weight:600}.ps.tx{background:var(--red);color:#fff}.ps.rx{background:var(--grn);color:#fff}.ps.busy{background:var(--amb);color:#fff}
+.meter{display:flex;gap:3px;height:34px;align-items:flex-end;margin:10px 0}.meter i{flex:1;height:8%;background:var(--pri);border-radius:2px;transition:height .08s}
+.pttbtn{display:block;margin:6px auto;width:170px;height:170px;border-radius:50%;border:6px solid var(--line);background:var(--key);color:var(--ink);font:inherit;font-size:18px;font-weight:700;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}.pttbtn.tx{background:var(--red);color:#fff;border-color:#f3b0aa;transform:scale(.97)}
+.mem{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.mem span{font-size:13px;padding:4px 10px;border-radius:99px;border:1px solid var(--line);display:flex;gap:6px;align-items:center}.mem span:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--grn)}.mem span.hot{background:var(--grn);color:#fff}.mem span.hot:before{background:#fff}
+details.note summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.msgs{height:calc(100vh - 300px);min-height:220px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:10px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.b{max-width:82%;padding:8px 12px;border-radius:14px;word-break:break-word}.b small{display:block;font-size:11px;opacity:.7;margin-top:2px;text-align:right}
+.b.me{align-self:flex-end;background:var(--pri);color:var(--priInk);border-bottom-right-radius:4px}.b.th{align-self:flex-start;background:var(--key);border-bottom-left-radius:4px}
+.b img{max-width:100%;max-height:220px;border-radius:10px;display:block;cursor:zoom-in}
+.fl{display:flex;gap:8px;align-items:center;color:inherit;text-decoration:none}
+.typ{min-height:22px;font-size:13px;color:var(--mut);padding:4px}
+.cmp{display:flex;gap:8px;align-items:center}
+.zoom{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px;cursor:zoom-out}.zoom img{max-width:100%;max-height:100%}
+#vid{display:none;position:relative;width:100%;max-width:420px;flex:1;min-height:200px;border-radius:16px;overflow:hidden;background:#101a17;margin:8px 0}#ov.vd #vid{display:block}
+#rv{position:absolute;inset:0;width:100%;height:100%}
+#lv,#lf{position:absolute;right:10px;bottom:10px;width:30%;max-width:120px;aspect-ratio:3/4;border-radius:10px;border:2px solid #fff;background:#000}#lv{object-fit:cover;transform:scaleX(-1);display:none}#lf{background:#33423e;color:#fff;display:none;align-items:center;justify-content:center;font-size:13px}
+#ov.vd #oa{display:none}#ov.vd{padding-top:calc(16px + env(safe-area-inset-top,0px))}#ov.vd h2{font-size:18px;margin:6px 0 0}#ov.vd #tm{font-size:20px;min-height:28px;margin:2px}
+.ctl .vonly{display:none}#ov.vd .ctl .vonly{display:flex}
+#ov.vd .ctl{gap:8px;margin-top:8px}#ov.vd .ctl button{aspect-ratio:auto;height:50px;border-radius:14px;flex-direction:row;font-size:12px}#ov.vd .ctl button i{font-size:18px}#ov.vd .btns{margin-top:12px}
+.mem span:before{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>Điện thoại SIP</h1><button class="pill" id="pill" onclick="tab('set')"><span class="dot"></span><span id="pt">Chưa đăng ký</span></button></header>
+<main id="m"></main>
+<nav role="tablist">
+<button role="tab" data-t="dial" onclick="tab('dial')">Bàn phím</button>
+<button role="tab" data-t="hist" onclick="tab('hist')">Lịch sử</button>
+<button role="tab" data-t="con" onclick="tab('con')">Danh bạ</button>
+<button role="tab" data-t="ptt" onclick="tab('ptt')">PTT</button>
+<button role="tab" data-t="set" onclick="tab('set')">Cài đặt</button>
+</nav>
+</div>
+
+<div id="ov" role="dialog" aria-modal="true">
+<div class="av" id="oa">?</div><h2 id="on"></h2><div id="st"></div><div id="tm"></div><div id="dt"></div>
+<div id="dtm"></div>
+<div class="ctl" id="ctl">
+<button id="bm" onclick="tg('mute')"><i>🎙</i>Tắt tiếng</button>
+<button id="bh" onclick="tg('hold')"><i>⏸</i>Giữ máy</button>
+<button id="bs" onclick="tg('spk')"><i>🔊</i>Loa ngoài</button>
+<button onclick="tg('pad')"><i>⌗</i>Phím số</button>
+<button id="br" onclick="tg('rec')"><i>⏺</i>Ghi âm</button>
+<button onclick="tg('xfer')"><i>↪</i>Chuyển cuộc gọi</button>
+</div>
+<div class="btns" id="bin" style="display:none"><button class="end" aria-label="Từ chối" onclick="rejectIn()">✕</button><button class="acc" aria-label="Trả lời" onclick="answer()">✆</button></div>
+<div class="btns" id="bout"><button class="end" aria-label="Kết thúc" onclick="hang()">✕</button></div>
+</div>
+<div id="toast"></div>
+<audio id="ra" autoplay></audio>
+<script src="jssip.min.js" onerror="var x=document.createElement('script');x.src='https://cdnjs.cloudflare.com/ajax/libs/jssip/3.10.0/jssip.min.js';document.head.appendChild(x)"></script>
+
+<script>
+const $=s=>document.querySelector(s);
+const DEF={acc:{name:"",user:"",pass:"",domain:"192.168.1.11",ws:"wss://192.168.1.11:8089/ws",proxy:"",port:"8089",tr:"WSS",ex:"",expires:"600",dtmf:"RFC2833",codecs:{"opus":1,"G.722":1,"PCMA":1,"PCMU":1,"GSM":0},dnd:false,auto:false,stun:true},con:[],hist:[],reg:false,ptt:{ch:[{name:'Điều độ',ext:'7001',type:'page',m:[{e:'101',n:'Hùng'},{e:'102',n:'Lan'},{e:'103',n:'Minh'}]},{name:'Kỹ thuật',ext:'8001',type:'conf',m:[{e:'104',n:'Tuấn'},{e:'105',n:'Hà'}]},{name:'Bảo vệ',ext:'110',type:'inter',m:[{e:'110',n:'Cổng chính'}]}],sel:0,latch:false,beep:true,sim:true,log:[]},chat:{}};
+let S;try{S=JSON.parse(localStorage.getItem("sip")||"null")}catch(e){S=null}
+if(!S)S=JSON.parse(JSON.stringify(DEF));
+S.acc=Object.assign({},DEF.acc,S.acc);S.ptt=Object.assign({},DEF.ptt,S.ptt);S.chat=S.chat||{};
+function save(){try{localStorage.setItem("sip",JSON.stringify(S))}catch(e){}}
+let cur="dial",num="",call=null,tmr=null,ac=null;
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),2200)}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const nameOf=n=>{const c=S.con.find(c=>c.num===n);return c?c.name:n};
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+/* âm thanh */
+function ctx(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume()}catch(e){}return ac}
+function tone(fs,d,v){const a=ctx();if(!a)return;const g=a.createGain();g.gain.value=v||.08;g.connect(a.destination);fs.forEach(f=>{const o=a.createOscillator();o.frequency.value=f;o.connect(g);o.start();o.stop(a.currentTime+d)})}
+const DT={1:[697,1209],2:[697,1336],3:[697,1477],4:[770,1209],5:[770,1336],6:[770,1477],7:[852,1209],8:[852,1336],9:[852,1477],"*":[941,1209],0:[941,1336],"#":[941,1477]};
+let ring=null;function ringStart(f){ringStop();const go=()=>tone(f,.9,.05);go();ring=setInterval(go,2200)}function ringStop(){clearInterval(ring);ring=null}
+/* điều hướng */
+function tab(t){if(tx&&t!=='ptt')txStop();cur=t;document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===t));({dial:vDial,hist:vHist,con:vCon,ptt:vPtt,set:vSet})[t]();status();badge()}
+function status(){const p=$("#pill");p.className="pill"+(S.reg===true?" on":S.reg==="busy"?" busy":"");$("#pt").textContent=S.reg===true?"Đã đăng ký"+(S.acc.user?" · "+S.acc.user:""):S.reg==="busy"?"Đang đăng ký…":"Chưa đăng ký"}
+function vDial(){
+$("#m").innerHTML=`<div class="display"><input id="n" inputmode="tel" placeholder="Nhập số hoặc SIP URI" value="${esc(num)}" aria-label="Số điện thoại"><button class="ib" aria-label="Xóa" onclick="del()">⌫</button></div>
+<div class="pad">${[["1",""],["2","ABC"],["3","DEF"],["4","GHI"],["5","JKL"],["6","MNO"],["7","PQRS"],["8","TUV"],["9","WXYZ"],["*",""],["0","+"],["#",""]].map(k=>`<button onclick="key('${k[0]}')">${k[0]}<small>${k[1]||"&nbsp;"}</small></button>`).join("")}</div>
+<div class="actions"><button class="ghost" onclick="addCon(num)">+ Lưu</button><button class="call" onclick="dial(num)">Gọi</button></div>`;
+$("#n").oninput=e=>num=e.target.value;$("#n").onkeydown=e=>{if(e.key==="Enter")dial(num)}}
+function key(k){num+=k;tone(DT[k]||[800],.12);$("#n").value=num}
+function del(){num=num.slice(0,-1);$("#n").value=num}
+function vHist(){
+const h=S.hist;$("#m").innerHTML=(h.length?`<div class="bar"><button class="ghost danger" onclick="S.hist=[];save();vHist()">Xóa lịch sử</button></div>`:"")+`<div class="list">${h.length?h.map((x,i)=>`<div class="row ${x.t==="miss"?"miss":""}"><div class="av">${esc(nameOf(x.n)[0]||"?").toUpperCase()}</div><div class="t"><b>${esc(nameOf(x.n))}</b><span>${{out:"Cuộc gọi đi",in:"Cuộc gọi đến",miss:"Nhỡ"}[x.t]} · ${new Date(x.at).toLocaleString("vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})}${x.d?" · "+fmt(x.d):""}</span></div><button class="ib" aria-label="Gọi lại" onclick="dial('${esc(x.n)}')">✆</button></div>`).join(""):`<div class="empty">Chưa có cuộc gọi nào. Hãy gọi thử từ tab Bàn phím.</div>`}</div>`}
+function vCon(){
+$("#m").innerHTML=`<div class="bar"><input id="q" placeholder="Tìm theo tên hoặc số" aria-label="Tìm"><button class="ghost primary" onclick="addCon('')">+ Thêm</button></div><div class="list" id="cl"></div>`;
+const r=()=>{const q=$("#q").value.toLowerCase();const l=S.con.filter(c=>(c.name+c.num).toLowerCase().includes(q));$("#cl").innerHTML=l.length?l.map(c=>`<div class="row"><div class="av">${esc(c.name[0]||"?").toUpperCase()}</div><div class="t"><b>${esc(c.name)}</b><span>${esc(c.num)}</span></div><button class="ib" aria-label="Nhắn tin" onclick="msgTo('${esc(c.num)}')">✉</button><button class="ib" aria-label="Sửa" onclick="editCon('${c.id}')">✎</button><button class="ib" aria-label="Gọi" onclick="dial('${esc(c.num)}')">✆</button></div>`).join(""):`<div class="empty">${S.con.length?"Không tìm thấy liên hệ.":"Danh bạ trống. Bấm “+ Thêm” để lưu số đầu tiên."}</div>`};$("#q").oninput=r;r()}
+function addCon(n){const nm=prompt("Tên liên hệ:");if(!nm)return;const nu=prompt("Số điện thoại / SIP URI:",n||"");if(!nu)return;S.con.push({id:"c"+Date.now(),name:nm.trim(),num:nu.trim()});save();toast("Đã lưu liên hệ");if(cur==="con")vCon()}
+function editCon(id){const c=S.con.find(c=>c.id===id);const nm=prompt("Tên (để trống để xóa liên hệ):",c.name);if(nm===null)return;if(nm.trim()===""){S.con=S.con.filter(x=>x.id!==id)}else{c.name=nm.trim();const nu=prompt("Số điện thoại:",c.num);if(nu)c.num=nu.trim()}save();vCon()}
+function vSet(){
+const a=S.acc,tr=["UDP","TCP","TLS","WSS"];
+$("#m").innerHTML=`<div class="note">Kết nối SIP thật qua WebSocket (WSS). Với chứng chỉ tự ký, hãy <a href="${esc((a.ws||'').replace(/^wss:/,'https:'))}" target="_blank" rel="noopener">mở địa chỉ này</a> một lần và chọn “Tiếp tục truy cập” trước khi đăng ký. Mật khẩu được lưu trong trình duyệt của máy này.</div>
+<div class="card"><h2>Tài khoản SIP</h2>
+<label>Tên hiển thị</label><input id="a_name" value="${esc(a.name)}">
+<div class="grid2"><div><label>Tên đăng nhập</label><input id="a_user" value="${esc(a.user)}" autocapitalize="off"></div><div><label>Mật khẩu</label><input id="a_pass" type="password" value="${esc(a.pass)}"></div></div>
+<label>Máy chủ / Tên miền SIP</label><input id="a_domain" placeholder="sip.congty.vn" value="${esc(a.domain)}" autocapitalize="off">
+<label>Địa chỉ WebSocket (WSS)</label><input id="a_ws" value="${esc(a.ws)}" autocapitalize="off">
+<div class="grid2"><div><label>Cổng</label><input id="a_port" inputmode="numeric" value="${esc(a.port)}"></div><div><label>Giao thức</label><select id="a_tr">${tr.map(t=>`<option ${t===a.tr?"selected":""}>${t}</option>`).join("")}</select></div></div>
+<div class="grid2"><div><label>Số máy lẻ (Extension)</label><input id="a_ex" value="${esc(a.ex)}"></div><div><label>Thời gian đăng ký (giây)</label><input id="a_expires" inputmode="numeric" value="${esc(a.expires)}"></div></div>
+<label>Kiểu gửi DTMF</label><select id="a_dtmf">${["RFC2833","SIP INFO","Trong băng tần"].map(t=>`<option ${t===a.dtmf?"selected":""}>${t}</option>`).join("")}</select>
+<div style="display:flex;gap:10px;margin-top:16px"><button class="ghost primary" style="flex:1" onclick="reg()">${S.reg===true?"Đăng ký lại":"Lưu và đăng ký"}</button>${S.reg?`<button class="ghost danger" onclick="unreg()">Hủy đăng ký</button>`:""}</div></div>
+<div class="card"><h2>Codec âm thanh</h2>${Object.keys(a.codecs).map(c=>`<label class="chk"><input type="checkbox" ${a.codecs[c]?"checked":""} onchange="S.acc.codecs['${c}']=this.checked?1:0;save()">${c}</label>`).join("")}</div>
+<div class="card"><h2>Tùy chọn</h2>
+<label class="chk"><input type="checkbox" ${a.dnd?"checked":""} onchange="S.acc.dnd=this.checked;save()">Không làm phiền (từ chối cuộc gọi đến)</label>
+<label class="chk"><input type="checkbox" ${a.auto?"checked":""} onchange="S.acc.auto=this.checked;save()">Tự động trả lời</label>
+<label class="chk"><input type="checkbox" ${a.stun?"checked":""} onchange="S.acc.stun=this.checked;save()">Dùng STUN để vượt NAT</label>
+</div>`}
+function collect(){["name","user","pass","domain","ws","port","tr","ex","expires","dtmf"].forEach(k=>{const e=$("#a_"+k);if(e)S.acc[k]=e.value.trim()})}
+/* Tin nhắn, ảnh, tệp (giả lập SIP MESSAGE) */
+let openT=null;
+const bytes=b=>b<1024?b+' B':b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB';
+const q=s=>esc(s).replace(/'/g,'&#39;');
+function save2(){try{localStorage.setItem('sip',JSON.stringify(S));return true}catch(e){return false}}
+function badge(){const b=document.querySelector('nav [data-t=msg]');if(!b)return;const u=Object.values(S.chat).reduce((a,l)=>a+l.filter(m=>m.f==='t'&&!m.r).length,0);b.textContent='Tin nhắn'+(u?' ('+u+')':'')}
+function vMsg(){openT=null;badge();const ts=Object.keys(S.chat).sort((a,b)=>{const la=S.chat[a].slice(-1)[0],lb=S.chat[b].slice(-1)[0];return (lb?lb.at:0)-(la?la.at:0)});
+$('#m').innerHTML=`<div class='bar'><button class='ghost primary' style='flex:1' onclick='newChat()'>+ Cuộc trò chuyện mới</button></div><div class='list'>${ts.length?ts.map(n=>{const l=S.chat[n],m=l[l.length-1],u=l.filter(x=>x.f==='t'&&!x.r).length;return `<div class='row' style='cursor:pointer' data-n='${q(n)}' onclick='openThread(this.dataset.n)'><div class='av'>${esc(nameOf(n)[0]||'?').toUpperCase()}</div><div class='t'><b>${esc(nameOf(n))}</b><span>${m?(m.k==='i'?'🖼 Ảnh':m.k==='f'?'📎 '+esc(m.nm):esc(m.x)):'Chưa có tin nhắn'}</span></div>${u?`<b style='color:var(--pri)'>${u}</b>`:''}</div>`}).join(''):`<div class='empty'>Chưa có cuộc trò chuyện nào. Bấm “+ Cuộc trò chuyện mới” hoặc nút ✉ trong Danh bạ.</div>`}</div>`}
+function newChat(){const n=prompt('Nhập số hoặc SIP URI người nhận:');if(!n||!n.trim())return;msgTo(n.trim())}
+function msgTo(n){S.chat[n]=S.chat[n]||[];save();if(cur!=='msg')tab('msg');openThread(n)}
+function openThread(n){openT=n;vThread()}
+function vThread(){const n=openT;(S.chat[n]||[]).forEach(m=>m.r=true);save();badge();
+$('#m').innerHTML=`<div class='bar' style='align-items:center;margin:0 0 8px'><button class='ib' aria-label='Quay lại' onclick='vMsg()'>‹</button><div style='flex:1;min-width:0'><b>${esc(nameOf(n))}</b><div style='font-size:13px;color:var(--mut)'>${esc(n)}</div></div><button class='ib' aria-label='Gọi' data-n='${q(n)}' onclick='dial(this.dataset.n)'>✆</button><button class='ib' aria-label='Gọi video' data-n='${q(n)}' onclick='dial(this.dataset.n,1)'>🎥</button></div>
+<div class='msgs' id='ms'></div><div class='typ' id='ty'></div>
+<div class='cmp'><button class='ib' aria-label='Gửi ảnh' onclick='pickImg()'>🖼</button><button class='ib' aria-label='Đính kèm tệp' onclick='pickFile()'>📎</button><input id='mi' placeholder='Nhập tin nhắn' autocomplete='off'><button class='ib' aria-label='Gửi' style='background:var(--pri);color:var(--priInk);border:0' onclick='sendTxt()'>➤</button></div>
+<input type='file' id='fi' accept='image/*' hidden><input type='file' id='ff' hidden>`;
+$('#mi').onkeydown=e=>{if(e.key==='Enter')sendTxt()};$('#fi').onchange=e=>{sendImg(e.target.files[0]);e.target.value=''};$('#ff').onchange=e=>{sendFile(e.target.files[0]);e.target.value=''};renderMsgs()}
+function pickImg(){$('#fi').click()}function pickFile(){$('#ff').click()}
+function renderMsgs(){const e=$('#ms');if(!e)return;const l=S.chat[openT]||[];e.innerHTML=l.length?l.map(m=>`<div class='b ${m.f==='m'?'me':'th'}'>${m.k==='i'?`<img src='${m.d}' alt='Ảnh' onclick='zoom(this.src)'>`:m.k==='f'?`<a class='fl' href='${m.d||'#'}' download='${q(m.nm)}'><span style='font-size:22px'>📎</span><span><b>${esc(m.nm)}</b><br><small>${bytes(m.sz)}${m.d?'':' · chưa lưu nội dung'}</small></span></a>`:''}${m.x?`<div>${esc(m.x)}</div>`:''}<small>${new Date(m.at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}${m.f==='m'?(m.s===2?' ✓✓':' ✓'):''}</small></div>`).join(''):`<div class='empty'>Chưa có tin nhắn. Hãy gửi lời chào đầu tiên.</div>`;e.scrollTop=e.scrollHeight}
+function zoom(src){const o=document.createElement('div');o.className='zoom';const i=new Image();i.src=src;o.appendChild(i);o.onclick=()=>o.remove();document.body.appendChild(o)}
+function canSend(){if(S.reg!==true){toast('Chưa đăng ký tài khoản SIP. Vào Cài đặt để đăng ký.');return false}return true}
+function push(m){const n=openT,l=S.chat[n]=S.chat[n]||[];m.f='m';m.at=Date.now();m.s=1;m.r=true;l.push(m);if(!save2()){m.d='';save2();toast('Bộ nhớ trình duyệt đầy: nội dung tệp không được lưu lại')}renderMsgs();setTimeout(()=>{m.s=2;save();if(openT===n)renderMsgs()},700);reply(m,n)}
+function sendTxt(){const i=$('#mi'),x=i.value.trim();if(!x||!canSend())return;i.value='';push({k:'t',x})}
+function sendImg(f){if(!f||!canSend())return;if(f.type.indexOf('image/')!==0){toast('Hãy chọn một tệp ảnh');return}const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);push({k:'i',x:'',nm:f.name,sz:f.size,d:c.toDataURL('image/jpeg',.72)})};im.onerror=()=>toast('Không đọc được ảnh');im.src=fr.result};fr.readAsDataURL(f)}
+function sendFile(f){if(!f||!canSend())return;if(f.size>700000){push({k:'f',x:'',nm:f.name,sz:f.size,d:''});toast('Tệp lớn hơn 700 KB: chỉ lưu tên và dung lượng');return}const fr=new FileReader();fr.onload=()=>push({k:'f',x:'',nm:f.name,sz:f.size,d:fr.result});fr.readAsDataURL(f)}
+function typ(on){const e=$('#ty');if(e)e.textContent=on?'Đang soạn tin…':''}
+function reply(m,n){setTimeout(()=>{if(openT===n)typ(true)},900);setTimeout(()=>{typ(false);const t=m.k==='i'?'Đã nhận ảnh, cảm ơn bạn.':m.k==='f'?'Đã nhận tệp '+m.nm+'.':['Đã nhận tin nhắn.','OK, mình xem ngay.','Cảm ơn, mình sẽ phản hồi sớm.'][Math.floor(Math.random()*3)];(S.chat[n]=S.chat[n]||[]).push({f:'t',k:'t',x:t,at:Date.now(),r:openT===n});save();if(openT===n&&cur==='msg')renderMsgs();else{badge();toast('Tin nhắn mới từ '+nameOf(n))}},2600)}
+/* Video call: camera thật nếu được cấp quyền, hình đối phương là mô phỏng */
+let ls=null,face='user',raf=0;
+async function vidStart(){const v=$('#lv'),f=$('#lf');v.style.visibility='visible';$('#bc').classList.remove('act');
+try{const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:face},audio:false});if(!call||!call.video){s.getTracks().forEach(t=>t.stop());return}ls=s;v.srcObject=s;v.style.display='block';f.style.display='none'}catch(e){ls=null;v.style.display='none';f.style.display='flex';toast('Không mở được camera, dùng hình mô phỏng')}
+cancelAnimationFrame(raf);draw()}
+function vidStop(){cancelAnimationFrame(raf);if(ls)ls.getTracks().forEach(t=>t.stop());ls=null;const v=$('#lv');if(v)v.srcObject=null}
+function draw(){const c=$('#rv');if(!c||!call||!call.video)return;const w=c.width=c.clientWidth||320,h=c.height=c.clientHeight||240,x=c.getContext('2d'),t=Date.now()/1000,up=call.st==='up';
+const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#173a33');g.addColorStop(1,'#0b1b17');x.fillStyle=g;x.fillRect(0,0,w,h);
+const r=Math.min(w,h)*.2+(up?Math.sin(t*3)*3:0);x.beginPath();x.arc(w/2,h/2,r,0,7);x.fillStyle='#2bb89c';x.fill();x.fillStyle='#06211b';x.font='700 '+r+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText((nameOf(call.n)[0]||'?').toUpperCase(),w/2,h/2);
+if(up){for(let i=0;i<12;i++){const bh=6+Math.abs(Math.sin(t*5+i))*22;x.fillStyle='rgba(255,255,255,.55)';x.fillRect(w/2-60+i*10,h-30-bh/2,6,bh)}}
+x.fillStyle='rgba(255,255,255,.75)';x.font='12px sans-serif';x.fillText(up?'Hình ảnh đối phương (mô phỏng)':'Đang chờ đối phương bật máy…',w/2,18);raf=requestAnimationFrame(draw)}
+/* RoIP PTT (giả lập) */
+let tx=null,rx=null,rxT=null,mtI=null;
+const PT={page:'Paging (một chiều)',conf:'Hội nghị ConfBridge',inter:'Intercom'};
+const pch=()=>S.ptt.ch[S.ptt.sel]||S.ptt.ch[0];
+const dialStr=c=>c.type==='inter'?'*80'+c.ext:c.ext;
+function vPtt(){const P=S.ptt,c=pch();
+$('#m').innerHTML=`<div class='chs'>${P.ch.map((x,i)=>`<button class='chip ${i===P.sel?'on':''}' onclick='selCh(${i})'>${esc(x.name)}<small>${esc(x.ext)}</small></button>`).join('')}<button class='chip' onclick='addCh()'>+ Kênh</button></div>
+<div class='card' style='padding-top:14px'><div class='row' style='padding:0 0 10px'><div class='t'><b>${esc(c.name)}</b><span>${PT[c.type]} · quay số ${esc(dialStr(c))}</span></div><button class='ib' aria-label='Sửa kênh' onclick='editCh()'>✎</button></div>
+<div id='ps' class='ps'>Sẵn sàng</div><div class='meter' id='mt'>${'<i></i>'.repeat(16)}</div>
+<button id='pb' class='pttbtn' aria-label='Nút nói PTT'></button>
+<div style='text-align:center;font-size:13px;color:var(--mut)'>Phím cách (Space) cũng dùng để nói</div>
+<div class='mem' id='mm'>${c.m.map(m=>`<span data-e='${esc(m.e)}'>${esc(m.e)}${m.n?' '+esc(m.n):''}</span>`).join('')}</div></div>
+<div class='card'><label class='chk'><input type='checkbox' ${P.latch?'checked':''} onchange='S.ptt.latch=this.checked;save();vPtt()'>Bấm một lần để nói, bấm lại để dừng</label><label class='chk'><input type='checkbox' ${P.beep?'checked':''} onchange='S.ptt.beep=this.checked;save()'>Âm báo bắt đầu và kết thúc lượt nói</label></div>
+<div class='list' id='pl' style='margin-bottom:12px'></div>
+<details class='note'><summary>Cấu hình FreePBX cho kênh PTT</summary><div style='margin-top:8px'>Tùy phiên bản, hãy đối chiếu với giao diện FreePBX của bạn:<br>• <b>Paging:</b> Applications → Paging and Intercom → Add Paging Group, đặt số (ví dụ 7001), chọn các extension, để Duplex = No cho chế độ một chiều.<br>• <b>Hội nghị:</b> Applications → Conferences, tạo phòng (ví dụ 8001); mọi máy cùng vào phòng.<br>• <b>Intercom:</b> gọi *80 + số máy lẻ.<br>• Máy đầu cuối (điện thoại IP, app) cần bật tự động trả lời khi có Alert-Info hoặc Call-Info, nếu không sẽ đổ chuông thay vì phát tiếng ngay.</div></details>`;
+const b=$('#pb');b.onpointerdown=e=>{e.preventDefault();P.latch?(tx?txStop():txStart()):txStart()};['onpointerup','onpointerleave','onpointercancel'].forEach(k=>b[k]=()=>{if(!S.ptt.latch)txStop()});b.oncontextmenu=e=>e.preventDefault();
+pbState(0);renderLog();if(rx){setPs('Đang nghe: '+rx.who,'rx');meter(true)}}
+function setPs(t,k){const e=$('#ps');if(!e)return;e.textContent=t;e.className='ps '+(k||'')}
+function pbState(on){const b=$('#pb');if(!b)return;b.classList.toggle('tx',!!on);const l=S.ptt.latch;b.innerHTML=on?(l?'Bấm để dừng':'Thả để dừng'):(l?'Bấm để nói':'Giữ để nói')}
+function meter(on){clearInterval(mtI);const bs=document.querySelectorAll('#mt i');if(on){mtI=setInterval(()=>document.querySelectorAll('#mt i').forEach(x=>x.style.height=(10+Math.random()*90)+'%'),90)}else bs.forEach(x=>x.style.height='8%')}
+function hlM(e){document.querySelectorAll('#mm span').forEach(s=>s.classList.toggle('hot',s.dataset.e===e))}
+function txStart(){if(tx)return;if(S.reg!==true||!ua){toast('Chưa đăng ký tài khoản SIP. Vào Cài đặt để đăng ký.');return}if(call||sess){toast('Đang trong cuộc gọi, không thể dùng PTT');return}
+const c=pch();tx={t:Date.now(),c,live:0,s:null};ctx();if(S.ptt.beep)tone([1000],.12);setPs('Đang kết nối '+dialStr(c)+'…','busy');pbState(1);
+try{const s=ua.call(uriOf(dialStr(c)),{mediaConstraints:{audio:true,video:false},pcConfig:{iceServers:[]}});tx.s=s;
+s.on('accepted',()=>{if(tx&&tx.s===s){tx.live=Date.now();setPs('Đang phát…','tx');meter(true)}});s.on('ended',()=>pttEnd(s));s.on('failed',e=>pttEnd(s,e.cause))}catch(e){tx=null;setPs('Sẵn sàng','');pbState(0);toast('Không gọi được kênh: '+e.message)}}
+function txStop(){if(!tx)return;const t=tx;tx=null;try{t.s&&t.s.terminate()}catch(e){}if(t.live){if(S.ptt.beep)tone([1500],.12);plog(t.c,'Bạn','tx',Math.max(1,Math.round((Date.now()-t.live)/1000)))}setPs('Sẵn sàng','');pbState(0);meter(false)}
+function pttEnd(s,cause){if(!tx||tx.s!==s)return;const t=tx;tx=null;if(t.live)plog(t.c,'Bạn','tx',Math.max(1,Math.round((Date.now()-t.live)/1000)));else if(cause&&cause!=='Canceled'){tone([480],.4);toast(CAUSE[cause]||cause)}setPs('Sẵn sàng','');pbState(0);meter(false)}
+function simRx(){}
+function plog(c,who,dir,d){S.ptt.log.unshift({c:c.name,who,dir,at:Date.now(),d});S.ptt.log=S.ptt.log.slice(0,30);save();renderLog()}
+function renderLog(){const e=$('#pl');if(!e)return;const l=S.ptt.log;e.innerHTML=l.length?l.slice(0,8).map(x=>`<div class='row'><div class='t'><b>${esc(x.who)}</b><span>${esc(x.c)} · ${x.dir==='tx'?'Bạn phát':'Nhận'} · ${new Date(x.at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})} · ${x.d}s</span></div></div>`).join(''):`<div class='empty'>Chưa có lượt nói nào. Giữ nút tròn để bắt đầu.</div>`}
+function selCh(i){if(tx)txStop();if(rx){clearTimeout(rxT);rx=null;meter(false)}S.ptt.sel=i;save();vPtt()}
+function addCh(){const nm=prompt('Tên kênh mới:');if(!nm)return;const ex=prompt('Số quay (ví dụ 7001):');if(!ex)return;const t=prompt('Loại kênh: 1 = Paging, 2 = Hội nghị, 3 = Intercom','1');S.ptt.ch.push({name:nm.trim(),ext:ex.trim(),type:{'2':'conf','3':'inter'}[t]||'page',m:[{e:'101',n:'Hùng'},{e:'102',n:'Lan'}]});S.ptt.sel=S.ptt.ch.length-1;save();vPtt()}
+function editCh(){const c=pch();const nm=prompt('Tên kênh (để trống để xóa kênh):',c.name);if(nm===null)return;if(!nm.trim()){if(S.ptt.ch.length<2){toast('Cần giữ lại ít nhất một kênh');return}S.ptt.ch.splice(S.ptt.sel,1);S.ptt.sel=0;save();vPtt();return}c.name=nm.trim();const ex=prompt('Số quay (nhóm Paging, phòng hội nghị hoặc số máy lẻ):',c.ext);if(ex)c.ext=ex.trim();const ms=prompt('Thành viên, dạng 101:Hùng, 102:Lan',c.m.map(m=>m.e+':'+m.n).join(', '));if(ms!==null)c.m=ms.split(',').map(s=>s.trim()).filter(Boolean).map(s=>{const p=s.split(':');return{e:p[0].trim(),n:(p[1]||'').trim()}});save();vPtt()}
+/* SIP thật bằng JsSIP */
+let ua=null,sess=null,rec=null,recCh=[],spkI=-1;
+const CAUSE={'Busy':'Máy bận','Rejected':'Bị từ chối','Not Found':'Số không tồn tại','Unavailable':'Không liên lạc được','Authentication Error':'Lỗi xác thực','User Denied Media Access':'Chưa cấp quyền micro cho trình duyệt','WebRTC Error':'Lỗi WebRTC (kiểm tra DTLS-SRTP, ICE)','Request Timeout':'Hết thời gian chờ','No Answer':'Không trả lời','Connection Error':'Mất kết nối tới tổng đài','Incompatible SDP':'Không tương thích codec/SDP','SIP Failure Code':'Tổng đài từ chối cuộc gọi'};
+function uriOf(n){n=String(n).trim();if(/^sips?:/i.test(n))return n;if(n.includes('@'))return 'sip:'+n;return 'sip:'+encodeURIComponent(n)+'@'+S.acc.domain}
+function hist(n,t,d){S.hist.unshift({n,t,at:Date.now(),d});S.hist=S.hist.slice(0,100);save()}
+function setReg(v){S.reg=v;status();if(cur==='set')vSet()}
+function stopUA(){if(ua){try{ua.stop()}catch(e){}ua=null}}
+function reg(){collect();const a=S.acc;
+if(typeof JsSIP==='undefined'){toast('Chưa tải được JsSIP: đặt file jssip.min.js cạnh file này hoặc kiểm tra Internet');return}
+if(!a.user||!a.domain||!a.ws){toast('Cần nhập tên đăng nhập, máy chủ SIP và địa chỉ WebSocket');return}
+save();stopUA();S.reg='busy';status();ctx();
+try{ua=new JsSIP.UA({sockets:[new JsSIP.WebSocketInterface(a.ws)],uri:'sip:'+a.user+'@'+a.domain,authorization_user:a.user,password:a.pass,display_name:a.name||a.user,register:true,register_expires:parseInt(a.expires)||600,session_timers:false})}catch(e){S.reg=false;status();toast('Cấu hình không hợp lệ: '+e.message);return}
+ua.on('registered',()=>{setReg(true);toast('Đăng ký thành công')});
+ua.on('registrationFailed',e=>{setReg(false);toast('Đăng ký thất bại: '+((e.response&&e.response.status_code)||e.cause||''))});
+ua.on('disconnected',()=>{if(S.reg!==false){setReg(false);toast('Không kết nối được WebSocket. Kiểm tra địa chỉ, cổng 8089, chứng chỉ')}});
+ua.on('newRTCSession',e=>{if(e.originator!=='remote')return;const s=e.session,n=s.remote_identity.uri.user;
+if(sess||tx||S.acc.dnd){if(S.acc.dnd)hist(n,'miss',0);s.terminate({status_code:486,reason_phrase:'Busy Here'});return}
+const h=(e.request.getHeader('Call-Info')||'')+' '+(e.request.getHeader('Alert-Info')||'');const pg=/answer-after=0|auto.?answer/i.test(h);
+call={n,dir:'in',st:'in',sec:0,mute:0,hold:0,rec:0,page:pg};sess=s;bind(s);show();ringStart([440,480]);
+if(pg||S.acc.auto)setTimeout(()=>{if(sess===s&&call&&call.st==='in')answer()},pg?150:800)});
+ua.start()}
+function unreg(){stopUA();setReg(false);toast('Đã hủy đăng ký')}
+function bind(s){
+s.on('peerconnection',e=>e.peerconnection.addEventListener('track',()=>attach(s)));
+s.on('progress',()=>{if(call&&sess===s&&call.dir==='out')$('#st').textContent='Đang đổ chuông…'});
+s.on('accepted',()=>{attach(s);if(call&&sess===s&&call.st!=='up')connect()});
+s.on('ended',()=>fin(s));s.on('failed',e=>fin(s,e.cause))}
+function attach(s){const pc=s.connection;if(!pc)return;const ms=new MediaStream();pc.getReceivers().forEach(r=>r.track&&ms.addTrack(r.track));const a=$('#ra');a.srcObject=ms;const p=a.play();if(p&&p.catch)p.catch(()=>{})}
+function dial(n){n=(n||'').trim();if(!n){toast('Hãy nhập số cần gọi');return}if(S.reg!==true||!ua){toast('Chưa đăng ký tài khoản SIP. Vào Cài đặt để đăng ký.');return}if(call||tx)return;
+call={n,dir:'out',st:'ring',sec:0,mute:0,hold:0,rec:0};show();ringStart([425]);ctx();
+try{sess=ua.call(uriOf(n),{mediaConstraints:{audio:true,video:false},pcConfig:{iceServers:[]}});bind(sess)}catch(e){ringStop();call=null;sess=null;$('#ov').classList.remove('show');toast('Không gọi được: '+e.message)}}
+function show(){const o=$('#ov');o.classList.add('show');const nm=nameOf(call.n);$('#oa').textContent=(nm[0]||'?').toUpperCase();$('#on').textContent=nm;$('#dt').textContent='';$('#tm').textContent='';$('#dtm').style.display='none';
+const inc=call.st==='in';$('#bin').style.display=inc?'flex':'none';$('#bout').style.display=inc?'none':'flex';$('#ctl').style.visibility=inc?'hidden':'visible';
+$('#st').textContent=inc?(call.page?'Cuộc gọi nhóm (Paging)…':'Cuộc gọi đến…'):'Đang gọi…';['bm','bh','bs','br'].forEach(i=>$('#'+i).classList.remove('act'));$('#bs').innerHTML='<i>🔊</i>Đổi loa';
+$('#dtm').innerHTML=['1','2','3','4','5','6','7','8','9','*','0','#'].map(k=>`<button onclick="sendDtmf('${k}')">${k}</button>`).join('')}
+function connect(){ringStop();call.st='up';$('#st').textContent=call.page?'Đang nghe cuộc gọi nhóm':'Đã kết nối';$('#bin').style.display='none';$('#bout').style.display='flex';$('#ctl').style.visibility='visible';$('#tm').textContent='00:00';tone([880],.15);clearInterval(tmr);tmr=setInterval(()=>{if(call&&!call.hold){call.sec++;$('#tm').textContent=fmt(call.sec)}},1000)}
+function answer(){if(!sess||!call||call.st!=='in')return;ringStop();ctx();sess.answer({mediaConstraints:{audio:true,video:false},pcConfig:{iceServers:[]}})}
+function rejectIn(){if(sess)sess.terminate({status_code:603,reason_phrase:'Decline'})}
+function hang(){if(sess)sess.terminate()}
+function fin(s,cause){if(!call||s!==sess)return;const up=call.st==='up',t=up?call.dir:(call.dir==='in'?'miss':'out');ringStop();clearInterval(tmr);stopRec();hist(call.n,t,call.sec);if(call.page&&up)plog({name:'Paging'},call.n,'rx',call.sec);
+if(cause&&!up&&call.dir==='out'&&cause!=='Canceled'&&cause!=='Terminated'){toast(CAUSE[cause]||cause);tone([480],.5)}else tone([480,620],.35);
+call=null;sess=null;const a=$('#ra');a.srcObject=null;$('#ov').classList.remove('show');if(cur==='hist')vHist()}
+function startRec(){try{const nm=call.n,a=ctx(),d=a.createMediaStreamDestination(),pc=sess.connection;pc.getReceivers().concat(pc.getSenders()).forEach(r=>{if(r.track&&r.track.kind==='audio')a.createMediaStreamSource(new MediaStream([r.track])).connect(d)});
+rec=new MediaRecorder(d.stream);recCh=[];rec.ondataavailable=e=>recCh.push(e.data);rec.onstop=()=>{const l=document.createElement('a');l.href=URL.createObjectURL(new Blob(recCh,{type:'audio/webm'}));l.download='ghi-am-'+nm+'-'+Date.now()+'.webm';l.click()};rec.start();return true}catch(e){toast('Không ghi âm được');return false}}
+function stopRec(){if(rec&&rec.state!=='inactive')rec.stop();rec=null}
+async function nextSpk(){const a=$('#ra');if(!a.setSinkId){toast('Trình duyệt không hỗ trợ chọn loa');return}const d=(await navigator.mediaDevices.enumerateDevices()).filter(x=>x.kind==='audiooutput');if(!d.length)return;spkI=(spkI+1)%d.length;try{await a.setSinkId(d[spkI].deviceId);toast('Loa: '+(d[spkI].label||'Thiết bị '+(spkI+1)))}catch(e){toast('Không đổi được loa')}}
+function tg(k){if(k==='pad'){const d=$('#dtm');d.style.display=d.style.display==='grid'?'none':'grid';return}
+if(!sess||!call||call.st!=='up')return;
+if(k==='spk'){nextSpk();return}
+if(k==='xfer'){const t=prompt('Chuyển cuộc gọi tới số:');if(t){try{sess.refer(uriOf(t));toast('Đã gửi yêu cầu chuyển tới '+t)}catch(e){toast('Không chuyển được')}}return}
+if(k==='mute'){call.mute?sess.unmute({audio:true}):sess.mute({audio:true})}
+if(k==='hold'){call.hold?sess.unhold():sess.hold()}
+if(k==='rec'){if(call.rec)stopRec();else if(!startRec())return}
+call[k]=call[k]?0:1;const id={mute:'bm',hold:'bh',rec:'br'}[k];$('#'+id).classList.toggle('act',!!call[k]);
+$('#st').textContent=call.hold?'Đang giữ máy':'Đã kết nối';toast({mute:['Đã bật mic','Đã tắt mic'],hold:['Tiếp tục cuộc gọi','Đang giữ máy'],rec:['Đã lưu file ghi âm','Đang ghi âm']}[k][call[k]])}
+function sendDtmf(k){tone(DT[k],.08);$('#dt').textContent+=k;try{sess.sendDTMF(k,{transportType:S.acc.dtmf==='SIP INFO'?'INFO':'RFC2833'})}catch(e){}}
+document.addEventListener("keydown",e=>{if(cur==="dial"&&!call&&document.activeElement.tagName!=="INPUT"&&/^[0-9*#]$/.test(e.key))key(e.key)});
+document.addEventListener('keydown',e=>{if(cur==='ptt'&&e.code==='Space'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();if(e.repeat)return;S.ptt.latch?(tx?txStop():txStart()):txStart()}});
+document.addEventListener('keyup',e=>{if(cur==='ptt'&&e.code==='Space'&&!S.ptt.latch)txStop()});
+S.reg=false;tab("dial");setTimeout(()=>{if(S.acc.user&&S.acc.pass&&S.acc.domain&&typeof JsSIP!=="undefined")reg()},1200);
+</script>
+</body>
+</html>
