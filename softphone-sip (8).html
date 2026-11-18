@@ -125,7 +125,7 @@ details.note summary{cursor:pointer;font-weight:600;color:var(--ink)}
 
 <script>
 const $=s=>document.querySelector(s);
-const DEF={acc:{name:"",user:"",pass:"",domain:"192.168.1.11",ws:"wss://192.168.1.11:8089/ws",proxy:"",port:"8089",tr:"WSS",ex:"",expires:"600",dtmf:"RFC2833",codecs:{"opus":1,"G.722":1,"PCMA":1,"PCMU":1,"GSM":0},dnd:false,auto:false,stun:""},con:[],hist:[],reg:false,ptt:{ch:[{name:'Điều độ',ext:'7001',type:'page',m:[{e:'101',n:'Hùng'},{e:'102',n:'Lan'},{e:'103',n:'Minh'}]},{name:'Kỹ thuật',ext:'8001',type:'conf',m:[{e:'104',n:'Tuấn'},{e:'105',n:'Hà'}]},{name:'Bảo vệ',ext:'110',type:'inter',m:[{e:'110',n:'Cổng chính'}]}],sel:0,latch:false,beep:true,sim:true,log:[]},chat:{}};
+const DEF={acc:{name:"",user:"",pass:"",domain:"192.168.159.134",ws:"wss://192.168.159.134:8089/ws",proxy:"",port:"8089",tr:"WSS",ex:"",expires:"600",dtmf:"RFC2833",codecs:{"opus":1,"G.722":1,"PCMA":1,"PCMU":1,"GSM":0},dnd:false,auto:false,stun:""},con:[],hist:[],reg:false,ptt:{ch:[{name:'Điều độ',ext:'7001',type:'page',m:[{e:'101',n:'Hùng'},{e:'102',n:'Lan'},{e:'103',n:'Minh'}]},{name:'Kỹ thuật',ext:'8001',type:'conf',m:[{e:'104',n:'Tuấn'},{e:'105',n:'Hà'}]},{name:'Bảo vệ',ext:'110',type:'inter',m:[{e:'110',n:'Cổng chính'}]}],sel:0,latch:false,beep:true,sim:true,log:[]},chat:{}};
 let S;try{S=JSON.parse(localStorage.getItem("sip")||"null")}catch(e){S=null}
 if(!S)S=JSON.parse(JSON.stringify(DEF));
 S.acc=Object.assign({},DEF.acc,S.acc);if(typeof S.acc.stun!=="string")S.acc.stun=S.acc.stun?"stun:stun.l.google.com:19302":"";S.ptt=Object.assign({},DEF.ptt,S.ptt);S.chat=S.chat||{};
